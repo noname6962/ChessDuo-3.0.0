@@ -242,9 +242,6 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel) {
         OpeningsSection(viewModel, navController)
         ClockBanner()
         Spacer(modifier = Modifier.height(30.dp))
-        BottomNavBar(
-            onHomeClick = { /* Handle home click */ },
-            onSettingsClick = { /* Handle settings click */ }
-        )
+
     }
 }

@@ -3,6 +3,7 @@ import androidx.media3.common.MediaItem
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,17 +51,22 @@ fun VideoScreen(
                     listOf(Color(0xFFB88762), Color(0xFFF3D8B6))
                 )
             )
+            .padding(6.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Title
         Text(
+
             text = "Learn $title",
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF8B0000),
             modifier = Modifier
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-        )
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
 
+
+        )
         AndroidView(
             modifier = Modifier
                 .padding(8.dp)
