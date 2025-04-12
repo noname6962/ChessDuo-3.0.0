@@ -1,3 +1,5 @@
+
+
 package com.example.chessduo_300
 
 import android.os.Bundle
@@ -7,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,7 +55,7 @@ fun ChessApp(viewModel: MainViewModel) {
             val title = backStackEntry.arguments?.getString("title") ?: ""
             val encodedUrl = backStackEntry.arguments?.getString("videoUrl") ?: ""
             val videoUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.name())
-            VideoScreen(title = title, videoUrl = videoUrl)
+            VideoScreen(title = title, videoUrl = videoUrl, lifecycleOwner = LocalLifecycleOwner.current)
         }
     }
 }
