@@ -12,11 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.chessduo_300.model.Screen
 import com.example.chessduo_300.ui.theme.ChessDuo_300Theme
 import com.example.chessduo_300.view.MainScreen
 import com.example.chessduo_300.view.VideoScreen
-import com.example.chessduo_300.view_model.MainViewModel
+import com.example.chessduo_300.viewmodel.MainViewModel
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -28,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChessDuo_300Theme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    AppNavigation(mainViewModel)
+                    ChessApp(mainViewModel)
                 }
             }
         }
@@ -36,23 +35,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel) {
+fun ChessApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.MainScreen.route) {
-        composable(route = Screen.MainScreen.route) {
-            MainScreen(navController, viewModel)
+    NavHost(navController = navController, startDestination = "main") {
+        composable("main") {
+            MainScreen(navController = navController, viewModel = viewModel)
         }
         composable(
-            route = Screen.VideoScreen.route + "/{title}/{videoUrl}",
+            route = "video/{title}/{videoUrl}",
             arguments = listOf(
                 navArgument("title") { type = NavType.StringType },
                 navArgument("videoUrl") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val title = URLDecoder.decode(backStackEntry.arguments?.getString("title"), StandardCharsets.UTF_8.name())
-            val videoUrl = URLDecoder.decode(backStackEntry.arguments?.getString("videoUrl"), StandardCharsets.UTF_8.name())
-            VideoScreen(title, videoUrl)
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val encodedUrl = backStackEntry.arguments?.getString("videoUrl") ?: ""
+            val videoUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.name())
+            VideoScreen(title = title, videoUrl = videoUrl)
         }
     }
+}
+
+// Optional: Create this to avoid hardcoding route strings in multiple places
+object NavRoutes {
+    const val MAIN = "main"
+    const val VIDEO = "video"
 }

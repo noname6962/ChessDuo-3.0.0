@@ -63,7 +63,7 @@ fun VideoScreen(title: String, videoUrl: String) {
                 painter = painterResource(id = R.drawable.chessboard_placeholder), // replace with your drawable
                 contentDescription = "Chessboard",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxWidth()
             )
 
             Icon(
@@ -79,7 +79,7 @@ fun VideoScreen(title: String, videoUrl: String) {
             factory = { context ->
                 PlayerView(context).apply {
                     player = ExoPlayer.Builder(context).build().apply {
-                        val mediaItem = MediaItem.fromUri(videoUrl) // ✅ CORRECT
+                        val mediaItem = MediaItem.fromUri(videoUrl)
                         setMediaItem(mediaItem)
                         prepare()
                         playWhenReady = true

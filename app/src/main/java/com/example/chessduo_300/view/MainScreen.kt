@@ -1,5 +1,6 @@
 package com.example.chessduo_300.view
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,8 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chessduo_300.model.ChessOpening
 import com.example.chessduo_300.R
-import com.example.chessduo_300.model.Screen
-import com.example.chessduo_300.view_model.MainViewModel
+import com.example.chessduo_300.viewmodel.MainViewModel
+
 
 
 @Composable
@@ -124,7 +125,8 @@ fun OpeningsSection(viewModel: MainViewModel, navController: NavController) {
         LazyRow {
             items(openings) { opening ->
                 OpeningCard(opening = opening) {
-                    navController.navigate(Screen.VideoScreen.route + "/${opening.name}/${opening.videoUrl}")
+                    navController.navigate("video/${opening.name}/${Uri.encode(opening.videoUrl)}")
+
                 }
             }
         }
