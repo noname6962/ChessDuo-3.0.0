@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.chessduo_300.ui.theme.ChessDuo_300Theme
 import com.example.chessduo_300.view.BottomNavBar
+import com.example.chessduo_300.view.ChessScreen
 import com.example.chessduo_300.view.MainScreen
 import com.example.chessduo_300.view.VideoScreen
 import com.example.chessduo_300.viewmodel.MainViewModel
@@ -72,6 +73,9 @@ fun ChessApp(viewModel: MainViewModel) {
                     // You might need to pass lifecycleOwner here
                     val lifecycleOwner = LocalLifecycleOwner.current
                     VideoScreen(title = title, videoUrl = videoUrl, lifecycleOwner = lifecycleOwner)
+                }
+                composable("chess"){
+                    ChessScreen()
                 }
             }
         }

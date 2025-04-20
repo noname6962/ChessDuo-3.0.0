@@ -135,7 +135,7 @@ fun OpeningsSection(viewModel: MainViewModel, navController: NavController) {
 
 
 @Composable
-fun PlayBanner() {
+fun PlayBanner(onPlayClick: () -> Unit) {
     val context = LocalContext.current
 
     Card(
@@ -144,9 +144,7 @@ fun PlayBanner() {
             .height(225.dp)
             .padding(16.dp)
             .clickable {
-                Toast
-                    .makeText(context, "Play clicked!", Toast.LENGTH_SHORT)
-                    .show()
+                onPlayClick()
             },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(8.dp)
@@ -238,7 +236,7 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel) {
                 .padding(start = 15.dp, top = 12.dp, bottom = 8.dp)
                 .align(Alignment.Start)
         )
-        PlayBanner()
+        PlayBanner(onPlayClick = { navController.navigate("chess") },)
         OpeningsSection(viewModel, navController)
         ClockBanner()
         Spacer(modifier = Modifier.height(30.dp))
