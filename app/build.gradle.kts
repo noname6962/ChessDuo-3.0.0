@@ -3,12 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-
+    id("com.chaquo.python")
 }
 
 android {
     namespace = "com.example.chessduo_300"
     compileSdk = 35
+
+    flavorDimensions += "pyVersion"
+    productFlavors {
+        create("py310") { dimension = "pyVersion" }
+        create("py311") { dimension = "pyVersion" }
+    }
 
     defaultConfig {
         applicationId = "com.example.chessduo_300"
@@ -18,7 +24,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            // On Apple silicon, you can omit x86_64.
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+
     }
+    sourceSets {
+        getByName("main") {
+            java.srcDir("src/main/python")
+        }
+    }
+
 
     buildTypes {
         release {
@@ -40,6 +58,7 @@ android {
         compose = true
     }
 }
+
 
 dependencies {
 
@@ -63,6 +82,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.kotlinx.serialization.json)
-
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.1")
 }
