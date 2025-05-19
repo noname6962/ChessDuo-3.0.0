@@ -4,12 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.chessduo_300.python.validateMove
@@ -27,46 +30,19 @@ fun ChessScreen() {
     var turn by remember { mutableStateOf(0) }
     val moves = remember { mutableStateListOf<List<Any>>() }
 
-    val whitePieces = remember {
-        mutableStateListOf(
-            mutableListOf("W", 1, 0, 0), // Rook
-            mutableListOf("S", 1, 1, 0), // Knight
-            mutableListOf("G", 1, 2, 0), // Bishop
-            mutableListOf("D", 1, 3, 0), // Queen
-            mutableListOf("K", 1, 4, 0), // King
-            mutableListOf("G", 1, 5, 0), // Bishop
-            mutableListOf("S", 1, 6, 0), // Knight
-            mutableListOf("W", 1, 7, 0), // Rook
-            mutableListOf("P", 1, 0, 1),
-            mutableListOf("P", 1, 1, 1),
-            mutableListOf("P", 1, 2, 1),
-            mutableListOf("P", 1, 3, 1),
-            mutableListOf("P", 1, 4, 1),
-            mutableListOf("P", 1, 5, 1),
-            mutableListOf("P", 1, 6, 1),
-            mutableListOf("P", 1, 7, 1)
-        )
-    }
+    val whitePieces = remember { mutableStateListOf<List<Any>>().apply { addAll(initialWhitePieces()) } }
+    val blackPieces = remember { mutableStateListOf<List<Any>>().apply { addAll(initialBlackPieces()) } }
 
-    val blackPieces = remember {
-        mutableStateListOf(
-            mutableListOf("W", 1, 0, 7), // Rook
-            mutableListOf("S", 1, 1, 7), // Knight
-            mutableListOf("G", 1, 2, 7), // Bishop
-            mutableListOf("D", 1, 3, 7), // Queen
-            mutableListOf("K", 1, 4, 7), // King
-            mutableListOf("G", 1, 5, 7), // Bishop
-            mutableListOf("S", 1, 6, 7), // Knight
-            mutableListOf("W", 1, 7, 7), // Rook
-            mutableListOf("P", 1, 0, 6),
-            mutableListOf("P", 1, 1, 6),
-            mutableListOf("P", 1, 2, 6),
-            mutableListOf("P", 1, 3, 6),
-            mutableListOf("P", 1, 4, 6),
-            mutableListOf("P", 1, 5, 6),
-            mutableListOf("P", 1, 6, 6),
-            mutableListOf("P", 1, 7, 6)
-        )
+    fun restartGame() {
+        whitePieces.clear()
+        blackPieces.clear()
+        whitePieces.addAll(initialWhitePieces())
+        blackPieces.addAll(initialBlackPieces())
+        turn = 0
+        moves.clear()
+        selectedSquare = null
+        winner = null
+        isGameOver = false
     }
 
     Box(
@@ -77,9 +53,26 @@ fun ChessScreen() {
             bialeFigury = whitePieces,
             czarneFigury = blackPieces,
             tileSize = tileSize,
+            isGameOver = isGameOver,
             onTileClick = { x, y ->
+                if (isGameOver) return@ChessBoard
+
                 if (selectedSquare == null) {
-                    selectedSquare = x to y
+                    val currentPieces = if (turn % 2 == 0) whitePieces else blackPieces
+                    val selectedPiece = currentPieces.find {
+                        val px = it[2] as? Int ?: -1
+                        val py = it[3] as? Int ?: -1
+                        val alive = it[1] as? Int ?: 0
+                        px == x && py == y && alive == 1
+                    }
+
+                    if (selectedPiece != null) {
+                        selectedSquare = x to y
+                    } else {
+                        println("Tapped empty or invalid tile at $x,$y — waiting for valid piece")
+                        selectedSquare = null
+                    }
+                    return@ChessBoard
                 } else {
                     val (fromX, fromY) = selectedSquare!!
                     selectedSquare = null
@@ -91,10 +84,8 @@ fun ChessScreen() {
                         context = context,
                         white = whitePieces.map { it.toList() },
                         black = blackPieces.map { it.toList() },
-                        x = fromX,
-                        y = fromY,
-                        vecX = vecX,
-                        vecY = vecY,
+                        x = fromX, y = fromY,
+                        vecX = vecX, vecY = vecY,
                         turn = turn,
                         moves = moves.map { it.toList() }
                     )
@@ -102,7 +93,6 @@ fun ChessScreen() {
                     if (isValid) {
                         val movingPieces = if (turn % 2 == 0) whitePieces else blackPieces
                         val opponentPieces = if (turn % 2 == 0) blackPieces else whitePieces
-
 
                         val isOccupiedByOwnPiece = movingPieces.any {
                             val px = it[2] as? Int ?: -1
@@ -116,12 +106,12 @@ fun ChessScreen() {
                             return@ChessBoard
                         }
 
-
                         val target = opponentPieces.indexOfFirst { it[2] == x && it[3] == y && it[1] == 1 }
                         if (target != -1) {
-                            val capturedPiece = opponentPieces[target]
+                            val capturedPiece = opponentPieces[target].toMutableList()
                             capturedPiece[1] = 0
                             opponentPieces[target] = capturedPiece
+
                         }
 
 
@@ -131,6 +121,7 @@ fun ChessScreen() {
                             val updatedPiece = mutableListOf(piece[0], piece[1], x, y)
                             movingPieces[index] = updatedPiece
                         }
+
 
                         turn += 1
 
@@ -146,13 +137,54 @@ fun ChessScreen() {
                             isGameOver = true
                             winner = if (turn % 2 == 0) "Black Wins!" else "White Wins!"
                         }
-
-
                     }
-
                 }
             }
         )
+
+        if (isGameOver && winner != null) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = {
+                    Text(
+                        text = "Checkmate",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                text = {
+                    Text(
+                        text = winner ?: "",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = "OK",
+                            modifier = Modifier
+                                .clickable {
+                                    isGameOver = false
+                                    winner = null
+                                }
+                                .padding(8.dp)
+                        )
+                        Text(
+                            text = "Restart",
+                            modifier = Modifier
+                                .clickable { restartGame() }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -161,7 +193,7 @@ fun ChessBoard(
     bialeFigury: List<List<Any>>,
     czarneFigury: List<List<Any>>,
     tileSize: Dp,
-
+    isGameOver: Boolean,
     onTileClick: (Int, Int) -> Unit
 ) {
     Box {
@@ -174,7 +206,9 @@ fun ChessBoard(
                             modifier = Modifier
                                 .size(tileSize)
                                 .background(if (isLight) Color(0xFFEAD7C0) else Color(0xFF8B5E3C))
-                                .clickable { onTileClick(x, y) }
+                                .clickable(enabled = !isGameOver) {
+                                    onTileClick(x, y)
+                                }
                         )
                     }
                 }
@@ -198,6 +232,29 @@ fun ChessBoard(
         }
     }
 }
+
+
+fun initialWhitePieces(): List<MutableList<Any>> = listOf(
+    mutableListOf("W", 1, 0, 0), mutableListOf("S", 1, 1, 0),
+    mutableListOf("G", 1, 2, 0), mutableListOf("D", 1, 3, 0),
+    mutableListOf("K", 1, 4, 0), mutableListOf("G", 1, 5, 0),
+    mutableListOf("S", 1, 6, 0), mutableListOf("W", 1, 7, 0),
+    mutableListOf("P", 1, 0, 1), mutableListOf("P", 1, 1, 1),
+    mutableListOf("P", 1, 2, 1), mutableListOf("P", 1, 3, 1),
+    mutableListOf("P", 1, 4, 1), mutableListOf("P", 1, 5, 1),
+    mutableListOf("P", 1, 6, 1), mutableListOf("P", 1, 7, 1)
+)
+
+fun initialBlackPieces(): List<MutableList<Any>> = listOf(
+    mutableListOf("W", 1, 0, 7), mutableListOf("S", 1, 1, 7),
+    mutableListOf("G", 1, 2, 7), mutableListOf("D", 1, 3, 7),
+    mutableListOf("K", 1, 4, 7), mutableListOf("G", 1, 5, 7),
+    mutableListOf("S", 1, 6, 7), mutableListOf("W", 1, 7, 7),
+    mutableListOf("P", 1, 0, 6), mutableListOf("P", 1, 1, 6),
+    mutableListOf("P", 1, 2, 6), mutableListOf("P", 1, 3, 6),
+    mutableListOf("P", 1, 4, 6), mutableListOf("P", 1, 5, 6),
+    mutableListOf("P", 1, 6, 6), mutableListOf("P", 1, 7, 6)
+)
 
 @Composable
 fun getDrawableId(letter: String, isWhite: Boolean): Int {
