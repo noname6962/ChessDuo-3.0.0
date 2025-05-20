@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChessScreen(initialTime: Int, increment: Int) {
     val context = LocalContext.current
-    val tileSize = 48.dp
+    val tileSize = 52.dp
 
     var isGameOver by remember { mutableStateOf(false) }
     var winner by remember { mutableStateOf<String?>(null) }
@@ -87,7 +87,7 @@ fun ChessScreen(initialTime: Int, increment: Int) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 36.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -356,6 +356,7 @@ fun ChessBoard(
                 modifier = Modifier
                     .offset(x = tileSize * x, y = tileSize * y)
                     .size(tileSize)
+                    .then(if (isWhite) Modifier.graphicsLayer(rotationZ = 180f) else Modifier)
             )
         }
     }

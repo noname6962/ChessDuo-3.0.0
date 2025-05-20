@@ -141,7 +141,7 @@ fun PlayBanner(onPlayClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(225.dp)
+            .height(250.dp)
             .padding(16.dp)
             .clickable {
                 onPlayClick()
@@ -184,7 +184,7 @@ fun ClockBanner(onPlayClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(225.dp)
+            .height(250.dp)
             .padding(16.dp)
             .clickable {
                 onPlayClick()
@@ -237,10 +237,9 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel) {
                 .padding(start = 15.dp, top = 12.dp, bottom = 8.dp)
                 .align(Alignment.Start)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         PlayBanner(onPlayClick = {navController.navigate("chess/$gameTime/$increment")})
         OpeningsSection(viewModel, navController)
         ClockBanner(onPlayClick = {navController.navigate("clock")})
-        Spacer(modifier = Modifier.height(30.dp))
-
     }
 }

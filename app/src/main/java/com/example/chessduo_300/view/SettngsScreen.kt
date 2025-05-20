@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -61,13 +62,12 @@ fun SettingsScreen(navController: NavController, viewModel: MainViewModel) {
                 }
             }
         }
-
+        Spacer(modifier = Modifier.height(16.dp))
         Text("Select Increment per Move", style = MaterialTheme.typography.headlineSmall)
 
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(vertical = 16.dp)
         ) {
             incrementOptions.forEach { inc ->
                 Button(
