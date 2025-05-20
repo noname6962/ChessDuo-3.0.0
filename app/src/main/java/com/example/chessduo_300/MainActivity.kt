@@ -2,6 +2,7 @@
 
 package com.example.chessduo_300
 
+import ChessClockScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,8 +24,9 @@ import com.example.chessduo_300.ui.theme.ChessDuo_300Theme
 import com.example.chessduo_300.view.BottomNavBar
 import com.example.chessduo_300.view.ChessScreen
 import com.example.chessduo_300.view.MainScreen
+import com.example.chessduo_300.view.SettingsScreen
 import com.example.chessduo_300.view.VideoScreen
-import com.example.chessduo_300.viewmodel.MainViewModel
+import com.example.chessduo_300.view_model.MainViewModel
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -36,10 +38,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChessDuo_300Theme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    BottomNavBar(
-                        onHomeClick = { /* Handle home click */ },
-                        onSettingsClick = { /* Handle settings click */ }
-                    )
                     ChessApp(mainViewModel)
                 }
             }
@@ -74,22 +72,34 @@ fun ChessApp(viewModel: MainViewModel) {
                     val lifecycleOwner = LocalLifecycleOwner.current
                     VideoScreen(title = title, videoUrl = videoUrl, lifecycleOwner = lifecycleOwner)
                 }
-                composable("chess"){
-                    ChessScreen()
+                composable("settings") {
+                    SettingsScreen(navController = navController, viewModel = viewModel)
                 }
+
+                // Chess screen with time and increment
+                composable(
+                    "chess/{initialTime}/{increment}",
+                    arguments = listOf(
+                        navArgument("initialTime") { type = NavType.IntType },
+                        navArgument("increment") { type = NavType.IntType }
+                    )
+                ) { backStackEntry ->
+                    val initialTime = backStackEntry.arguments?.getInt("initialTime") ?: 180
+                    val increment = backStackEntry.arguments?.getInt("increment") ?: 0
+                    ChessScreen(initialTime = initialTime, increment = increment)
+                }
+
+                composable("clock") {
+                    ChessClockScreen(viewModel = viewModel, navController = navController)
+                }
+
+
             }
         }
 
         BottomNavBar(
             onHomeClick = { navController.navigate("main") },
-            onSettingsClick = {}
+            onSettingsClick = {navController.navigate("settings")}
         )
     }
-}
-
-
-// Optional: Create this to avoid hardcoding route strings in multiple places
-object NavRoutes {
-    const val MAIN = "main"
-    const val VIDEO = "video"
 }

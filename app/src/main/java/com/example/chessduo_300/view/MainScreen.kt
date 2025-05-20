@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chessduo_300.model.ChessOpening
 import com.example.chessduo_300.R
-import com.example.chessduo_300.viewmodel.MainViewModel
+import com.example.chessduo_300.view_model.MainViewModel
 
 
 
@@ -178,7 +178,7 @@ fun PlayBanner(onPlayClick: () -> Unit) {
 }
 
 @Composable
-fun ClockBanner() {
+fun ClockBanner(onPlayClick: () -> Unit) {
     val context = LocalContext.current
 
     Card(
@@ -187,9 +187,7 @@ fun ClockBanner() {
             .height(225.dp)
             .padding(16.dp)
             .clickable {
-                Toast
-                    .makeText(context, "Play clicked!", Toast.LENGTH_SHORT)
-                    .show()
+                onPlayClick()
             },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(8.dp)
@@ -221,6 +219,9 @@ fun ClockBanner() {
 
 @Composable
 fun MainScreen(navController: NavController, viewModel: MainViewModel) {
+    val gameTime by viewModel.gameTime.collectAsState()
+    val increment by viewModel.increment.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(50.dp))  // Push down by 100dp
         Text(
@@ -236,9 +237,9 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel) {
                 .padding(start = 15.dp, top = 12.dp, bottom = 8.dp)
                 .align(Alignment.Start)
         )
-        PlayBanner(onPlayClick = { navController.navigate("chess") },)
+        PlayBanner(onPlayClick = {navController.navigate("chess/$gameTime/$increment")})
         OpeningsSection(viewModel, navController)
-        ClockBanner()
+        ClockBanner(onPlayClick = {navController.navigate("clock")})
         Spacer(modifier = Modifier.height(30.dp))
 
     }
